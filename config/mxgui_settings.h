@@ -40,7 +40,7 @@
 // The PARSING_FROM_IDE is because Netbeans gets confused by this, it is never
 // defined when compiling the code.
 #ifndef PARSING_FROM_IDE
-#error This error is a reminder that you have not edited mxgui_settings.h yet.
+//#error This error is a reminder that you have not edited mxgui_settings.h yet.
 #endif //PARSING_FROM_IDE
 
 namespace mxgui {
@@ -54,7 +54,7 @@ namespace mxgui {
 /// - level 2: Touchscreen support, display arbitration (multiple applications
 ///   contending one display), higher level widgets
 ///
-#define MXGUI_LEVEL_2
+//#define MXGUI_LEVEL_2
 
 ///
 /// Maximum number of appications that can run simultaneously
