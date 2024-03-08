@@ -40,7 +40,8 @@ preprocess_png(IMG_OUT ${FOO_IMG})
 
 # List here your application files
 set(FOO_SRCS
-    ../../_examples/buttonTest/buttonTest.cpp)
+    ../../_examples/scrollingTest/scrollingTest.cpp)
+#    ../../_examples/buttonTest/buttonTest.cpp)
 
 # These are the sources of the mxgui library and the simulator
 set(LIB_SRCS
@@ -56,6 +57,7 @@ set(LIB_SRCS
     ../../level2/button.cpp
     ../../level2/checkbox.cpp
     ../../level2/radio_button.cpp
+    ../../level2/scrolling_list.cpp
     ../../level2/application.cpp
     ../../level2/drawing_context_proxy.cpp
     ../../level2/label.cpp
