@@ -17,6 +17,7 @@ misc_inst.cpp                          \
 tga_image.cpp                          \
 resourcefs.cpp                         \
 resource_image.cpp                     \
+textbox.cpp                            \
 level2/input.cpp                       \
 level2/application.cpp                 \
 level2/drawing_context_proxy.cpp       \
@@ -44,8 +45,10 @@ drivers/display_stm32f4discovery.cpp   \
 drivers/event_stm32f4discovery.cpp     \
 drivers/display_generic_1bpp.cpp       \
 drivers/display_generic_4bpp.cpp       \
-drivers/display_st7735.cpp			   \
-drivers/display_st25dvdiscovery.cpp
+drivers/display_st7735.cpp             \
+drivers/display_st25dvdiscovery.cpp    \
+drivers/display_stm3220g-eval.cpp      \
+drivers/event_stm3220g-eval.cpp
 
 ifeq ("$(VERBOSE)","1")
 Q := 

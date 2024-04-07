@@ -1,5 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2010, 2011, 2012, 2013, 2014 by Terraneo Federico       *
+ *   Copyright (C) 2014 by Terraneo Federico                               *
+ *   Copyright (C) 2024 by Daniele Cattaneo                                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -25,49 +26,55 @@
  *   along with this program; if not, see <http://www.gnu.org/licenses/>   *
  ***************************************************************************/
 
-#include "mxgui/entry.h"
-#include "mxgui/display.h"
-#include "mxgui/misc_inst.h"
-#include "mxgui/level2/input.h"
-#include <cstdio>
-#include <cstring>
+#ifndef MXGUI_LIBRARY
+#error "This is header is private, it can be used only within mxgui."
+#error "If your code depends on a private header, it IS broken."
+#endif //MXGUI_LIBRARY
 
-using namespace std;
-using namespace mxgui;
+#include <functional>
+#include "level2/input.h"
 
-ENTRY()
+#ifndef EVENT_STM3220G_EVAL_H
+#define	EVENT_STM3220G_EVAL_H
+
+#ifdef _BOARD_STM3220G_EVAL
+
+namespace mxgui {
+
+/**
+ * Implementation class to handle events in the Mp3v2 backend
+ */
+class InputHandlerImpl
 {
-    Display& display=DisplayManager::instance().getDisplay();
-    unsigned short maxX = display.getWidth()-1;
-    unsigned short maxY = display.getHeight()-1;
-    InputHandler& backend=InputHandler::instance();
-    short oldX=0,oldY=0;
-    for(;;)
-    {
-        Event e=backend.getEvent();
-        switch(e.getEvent())
-        {   
-            case EventType::ButtonA:
-                display.turnOff();
-                return 0;
-            case EventType::TouchDown:
-            case EventType::TouchUp:
-            case EventType::TouchMove:
-            {
-                DrawingContext dc(display);
-                dc.line(Point(0,oldY),Point(maxX,oldY),black);
-                dc.line(Point(oldX,0),Point(oldX,maxY),black);
-                oldX=e.getPoint().x();
-                oldY=e.getPoint().y();
-                dc.line(Point(0,oldY),Point(maxX,oldY),white);
-                dc.line(Point(oldX,0),Point(oldX,maxY),white);
-                char line[128];
-                siprintf(line,"(%d, %d)          ",oldX,oldY);
-                dc.write(Point(0,0),line);
-                break;
-            }
-            default:
-                break;
-        }
-    }
-}
+public:
+    InputHandlerImpl();
+
+    /**
+     * \return an event, blocking
+     */
+    Event getEvent();
+
+    /**
+     * \return an event, nonblocking. A default constructed event is returned
+     * if there are no events.
+     */
+    Event popEvent();
+    
+    /**
+     * Register a callback that will be called every time an event is geenrated
+     * 
+     * Note: the thread calling the callback has a very small stack.
+     *
+     * Note: concurrent access to this memebr function causes undefined behaviour
+     * 
+     * \param cb new callback to register
+     * \return the previous callback
+     */
+    std::function<void ()> registerEventCallback(std::function<void ()> cb);
+};
+
+} //namespace mxgui
+
+#endif //_BOARD_STM3220G_EVAL
+
+#endif //EVENT_STM3220G_EVAL_H

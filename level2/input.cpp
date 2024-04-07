@@ -37,6 +37,7 @@
 #include "drivers/event_redbull_v2.h"
 #include "drivers/event_sony-newman.h"
 #include "drivers/event_stm32f4discovery.h"
+#include "drivers/event_stm3220g-eval.h"
 
 using namespace std;
 

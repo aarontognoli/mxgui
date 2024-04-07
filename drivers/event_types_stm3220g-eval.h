@@ -1,5 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2010, 2011, 2012, 2013, 2014 by Terraneo Federico       *
+ *   Copyright (C) 2014 by Terraneo Federico                               *
+ *   Copyright (C) 2024 by Daniele Cattaneo                                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -25,49 +26,40 @@
  *   along with this program; if not, see <http://www.gnu.org/licenses/>   *
  ***************************************************************************/
 
-#include "mxgui/entry.h"
-#include "mxgui/display.h"
-#include "mxgui/misc_inst.h"
-#include "mxgui/level2/input.h"
-#include <cstdio>
-#include <cstring>
+#ifndef EVENT_TYPES_STM3220G_EVAL_H
+#define	EVENT_TYPES_STM3220G_EVAL_H
 
-using namespace std;
-using namespace mxgui;
+#ifdef _BOARD_STM3220G_EVAL
 
-ENTRY()
+class EventType
 {
-    Display& display=DisplayManager::instance().getDisplay();
-    unsigned short maxX = display.getWidth()-1;
-    unsigned short maxY = display.getHeight()-1;
-    InputHandler& backend=InputHandler::instance();
-    short oldX=0,oldY=0;
-    for(;;)
+public:
+    enum E
     {
-        Event e=backend.getEvent();
-        switch(e.getEvent())
-        {   
-            case EventType::ButtonA:
-                display.turnOff();
-                return 0;
-            case EventType::TouchDown:
-            case EventType::TouchUp:
-            case EventType::TouchMove:
-            {
-                DrawingContext dc(display);
-                dc.line(Point(0,oldY),Point(maxX,oldY),black);
-                dc.line(Point(oldX,0),Point(oldX,maxY),black);
-                oldX=e.getPoint().x();
-                oldY=e.getPoint().y();
-                dc.line(Point(0,oldY),Point(maxX,oldY),white);
-                dc.line(Point(oldX,0),Point(oldX,maxY),white);
-                char line[128];
-                siprintf(line,"(%d, %d)          ",oldX,oldY);
-                dc.write(Point(0,0),line);
-                break;
-            }
-            default:
-                break;
-        }
-    }
-}
+        // These are a must on all backends -- begin
+        Default=0,           // This actually means 'no event'
+        WindowPartialRedraw, // At least one drawable has requested redraw
+        WindowForeground,    // Window manager moved this window to foreground
+        WindowBackground,    // Window manager moved this window to background
+        WindowQuit,          // Window manager requested the window to close
+        // These are a must on all backends -- end
+        
+        TouchDown=1,
+        TouchUp=2,
+        TouchMove=3,
+        ButtonA=4,      // The "Key" or "User" button
+        ButtonB=5,      // The "Tamper" button
+        ButtonC=6,      // The "Wakeup" button
+        ButtonJoy=7,    // Center button on the joystick
+        ButtonUp=8,     // Up button on the joystick
+        ButtonDown=9,   // Down button on the joystick
+        ButtonLeft=10,  // Left button on the joystick
+        ButtonRight=11  // Right button on the joystick
+    };
+private:
+    EventType();
+};
+
+#endif //_BOARD_STM3220G_EVAL
+
+#endif //EVENT_TYPES_STM3220G_EVAL_H
