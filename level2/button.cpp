@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2011 by Terraneo Federico                               *
+ *   Copyright (C) 2014 by Terraneo Federico                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -25,36 +25,76 @@
  *   along with this program; if not, see <http://www.gnu.org/licenses/>   *
  ***************************************************************************/
 
-#ifndef EVENT_TYPES_QT_H
-#define	EVENT_TYPES_QT_H
 
-#if !defined(_MIOSIX) && !defined(_WINDOWS)
+#include "button.h"
+#ifdef MXGUI_LEVEL_2
 
-class EventType
+
+#include <utility>
+
+using namespace std;
+
+namespace mxgui {
+
+Button::Button(Window* w, DrawArea da, const string& text)
+    : InteractableButton(w,da)
 {
-public:
-    enum E
+    this->innerPointTl = Point(da.first.x()+3,da.first.y()+3);
+    this->innerPointBr = Point(da.second.x()-3,da.second.y()-3);
+    if(text!="")
     {
-        // These are a must on all backends -- begin
-        Default=0,           // This actually means 'no event'
-        WindowPartialRedraw=8, // At least one drawable has requested redraw
-        WindowForeground=9,    // Window manager moved this window to foreground
-        WindowBackground=10,    // Window manager moved this window to background
-        WindowQuit=11,          // Window manager requested the window to close
-        // These are a must on all backends -- end
-        
-        TouchDown=1,
-        TouchUp=2,
-        TouchMove=3,
-        ButtonA=4,
-        ButtonB=5,
-        KeyDown=6,
-        KeyUp=7
-    };
-private:
-    EventType();
-};
+        this->text=new Label(w,DrawArea(innerPointTl,innerPointBr),text);
+        this->text->setXAlignment(Alignment::CENTER);
+        this->text->setYAlignment(Alignment::CENTER);
+    }
+    resetState();
+    
+}
 
-#endif //!defined(_MIOSIX) && !defined(_WINDOWS)
+Button::Button(Window *w, Point p, short width, short height, const string& text)
+    : Button(w,DrawArea(p,Point(p.x()+width,p.y()+height)),text)
+{}
 
-#endif //EVENT_TYPES_QT_H
+void Button::resetState()
+{
+    if(colors!=make_pair(black,lightGrey))
+    {
+        colors=make_pair(black,lightGrey);
+        if(text)
+            text->setColors(colors);
+        InteractableButton::resetState();
+    }
+}
+void Button::buttonDown()
+{
+    if(colors!=make_pair(white,darkGrey))
+    {
+        colors=make_pair(white,darkGrey);
+        if(text)
+            text->setColors(colors);    
+        enqueueForRedraw();
+    } 
+    
+}
+
+void Button::buttonUp()
+{
+    resetState();
+    InteractableButton::buttonUp();
+}
+
+void Button::onDraw(DrawingContextProxy& dc)
+{
+    DrawArea da=getDrawArea();
+    dc.clear(da.first,da.second,colors.second);
+    dc.drawImage(da.first,tl);
+    dc.drawImage(Point(da.second.x()-2,da.first.y()),tr);
+    dc.drawImage(Point(da.first.x(),da.second.y()-2),bl);
+    dc.drawImage(innerPointBr,br);
+}
+
+
+
+}//namespace mxgui
+
+#endif //MXGUI_LEVEL_2

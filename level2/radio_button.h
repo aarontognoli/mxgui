@@ -1,6 +1,5 @@
 /***************************************************************************
  *   Copyright (C) 2014 by Terraneo Federico                               *
- *   Copyright (C) 2024 by Daniele Cattaneo                                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -26,40 +25,79 @@
  *   along with this program; if not, see <http://www.gnu.org/licenses/>   *
  ***************************************************************************/
 
-#ifndef EVENT_TYPES_STM3220G_EVAL_H
-#define	EVENT_TYPES_STM3220G_EVAL_H
+#ifndef RADIOBUTTON_H
+#define	RADIOBUTTON_H
+#include "checkbox.h"
 
-#ifdef _BOARD_STM3220G_EVAL
+#ifdef MXGUI_LEVEL_2
 
-class EventType
+namespace mxgui {
+
+//forward decls
+class RadioGroup;
+/**
+ * RadioButton.
+ */
+class RadioButton : public CheckBox
 {
 public:
-    enum E
-    {
-        // These are a must on all backends -- begin
-        Default=0,           // This actually means 'no event'
-        WindowPartialRedraw=12, // At least one drawable has requested redraw
-        WindowForeground=13,    // Window manager moved this window to foreground
-        WindowBackground=14,    // Window manager moved this window to background
-        WindowQuit=15,          // Window manager requested the window to close
-        // These are a must on all backends -- end
-        
-        TouchDown=1,
-        TouchUp=2,
-        TouchMove=3,
-        ButtonA=4,      // The "Key" or "User" button
-        ButtonB=5,      // The "Tamper" button
-        ButtonC=6,      // The "Wakeup" button
-        ButtonJoy=7,    // Center button on the joystick
-        ButtonUp=8,     // Up button on the joystick
-        ButtonDown=9,   // Down button on the joystick
-        ButtonLeft=10,  // Left button on the joystick
-        ButtonRight=11  // Right button on the joystick
-    };
+    
+    /**
+     * Constructor
+     * The object will be immediately enqueued for redraw
+     * \param w window to which this object belongs
+     * \param group the group to which this radio button belongs
+     * \param p upper left point of the CheckBox
+     * \param dimension width of the CheckBox ( it's a square )
+     * \param text label of the checkbox
+     */
+    RadioButton(Window *w,RadioGroup *group, Point p, short dimension=15, const std::string& text="");
+
+    /**
+     * \internal
+     * Overridden this member function to draw the object.
+     * \param dc drawing context used to draw the object
+     */
+    virtual void onDraw(DrawingContextProxy& dc);
+
+    /**
+     * Returns the string of the label
+     */
+    std::string getLabel();
+    /**
+     * Used by RadioGroup to set the checked state of the radio button
+     * \param checked value to set
+     */
+    void setChecked(bool checked);
+    
 private:
-    EventType();
+    RadioGroup* group; ///< The group to which this radio button belongs
+    void check();///< Overridden to call the RadioGroup::setChecked
 };
 
-#endif //_BOARD_STM3220G_EVAL
+class RadioGroup
+{
+public:
+    RadioGroup();
+    /**
+     * Adds a radio button to the group
+     * \param rb the radio button to add
+     */
+    void addRadioButton(RadioButton* rb);
+    /**
+     * Sets the checked radio button
+     * \param rb the radio button to check
+     */
+    void setChecked(RadioButton* rb);
+    RadioButton* getChecked();//< Returns the checked radio button or nullptr if none is checked
+    std::list<RadioButton*> radioButtons;//< The list of radio buttons which belong to this group
 
-#endif //EVENT_TYPES_STM3220G_EVAL_H
+private:
+    RadioButton* checked;//< The checked radio button
+};
+
+} //namesapce mxgui
+
+#endif //MXGUI_LEVEL_2
+
+#endif //RADIOBUTTON_H

@@ -1,6 +1,5 @@
 /***************************************************************************
  *   Copyright (C) 2014 by Terraneo Federico                               *
- *   Copyright (C) 2024 by Daniele Cattaneo                                *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -26,40 +25,108 @@
  *   along with this program; if not, see <http://www.gnu.org/licenses/>   *
  ***************************************************************************/
 
-#ifndef EVENT_TYPES_STM3220G_EVAL_H
-#define	EVENT_TYPES_STM3220G_EVAL_H
 
-#ifdef _BOARD_STM3220G_EVAL
+#include "radio_button.h"
+#ifdef MXGUI_LEVEL_2
 
-class EventType
+
+#include <utility>
+
+using namespace std;
+
+namespace mxgui {
+//RadioGroup
+
+RadioGroup::RadioGroup()
 {
-public:
-    enum E
+    radioButtons = list<RadioButton*>();
+    checked=nullptr;
+}
+
+
+void RadioGroup::addRadioButton(RadioButton *rb)
+{
+    if(std::find(radioButtons.begin(), radioButtons.end(), rb) == radioButtons.end())
+        radioButtons.push_back(rb);
+}
+
+void RadioGroup::setChecked(RadioButton *rb)
+{
+    for(auto it : radioButtons)
     {
-        // These are a must on all backends -- begin
-        Default=0,           // This actually means 'no event'
-        WindowPartialRedraw=12, // At least one drawable has requested redraw
-        WindowForeground=13,    // Window manager moved this window to foreground
-        WindowBackground=14,    // Window manager moved this window to background
-        WindowQuit=15,          // Window manager requested the window to close
-        // These are a must on all backends -- end
         
-        TouchDown=1,
-        TouchUp=2,
-        TouchMove=3,
-        ButtonA=4,      // The "Key" or "User" button
-        ButtonB=5,      // The "Tamper" button
-        ButtonC=6,      // The "Wakeup" button
-        ButtonJoy=7,    // Center button on the joystick
-        ButtonUp=8,     // Up button on the joystick
-        ButtonDown=9,   // Down button on the joystick
-        ButtonLeft=10,  // Left button on the joystick
-        ButtonRight=11  // Right button on the joystick
-    };
-private:
-    EventType();
-};
+        if(it!=rb)
+        {
+            if(it->isChecked())
+            {
+                it->setChecked(false);
+                it->enqueueForRedraw();
+            }
+            
+        }
+        else
+        {
+            
+            if(!it->isChecked())
+            {
 
-#endif //_BOARD_STM3220G_EVAL
+                checked=rb;
+                it->setChecked(true);
+                it->enqueueForRedraw();
+            }
+        }
+    }
+}
+RadioButton* RadioGroup::getChecked()
+{
+    return checked;
+}
+//RadioButton
 
-#endif //EVENT_TYPES_STM3220G_EVAL_H
+RadioButton::RadioButton(Window *w,RadioGroup *group, Point p, short dimension, const string& text)
+    : CheckBox(w,p,dimension,text,false)
+{
+    this->group=group;
+    this->group->addRadioButton(this);
+    enqueueForRedraw();
+}
+
+
+
+
+void RadioButton::check()
+{
+    group->setChecked(this);
+    enqueueForRedraw();
+}
+void RadioButton::setChecked(bool checked)
+{
+    this->checked=checked;
+}
+
+string RadioButton::getLabel()
+{
+    return text->getText();
+}
+
+void RadioButton::onDraw(DrawingContextProxy& dc)
+{
+    DrawArea da=getDrawArea();
+    dc.clear(da.first,da.second,colors.second);
+    dc.drawImage(da.first,tl);
+    dc.drawImage(Point(da.second.x()-2,da.first.y()),tr);
+    dc.drawImage(Point(da.first.x(),da.second.y()-2),bl);
+    dc.drawImage(innerPointBr,br);
+    dc.drawRectangle(innerPointTl,innerPointBr,black);
+    if(isChecked())
+    {
+        dc.clear(innerPointTl,innerPointBr,black);
+    }
+
+}
+
+
+
+}//namespace mxgui
+
+#endif //MXGUI_LEVEL_2

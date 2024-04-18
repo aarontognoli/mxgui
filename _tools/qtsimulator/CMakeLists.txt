@@ -40,11 +40,8 @@ preprocess_png(IMG_OUT ${FOO_IMG})
 
 # List here your application files
 set(FOO_SRCS
-    ../../_examples/teapot/fps_counter.cpp
-    ../../_examples/teapot/bresenham_fsm.cpp
-    ../../_examples/teapot/triangle_fsm.cpp
-    ../../_examples/teapot/rendering_engine.cpp
-    ../../_examples/teapot/teapot.cpp)
+#    ../../_examples/scrollingTest/scrollingTest.cpp)
+    ../../_examples/buttonTest/buttonTest.cpp)
 
 # These are the sources of the mxgui library and the simulator
 set(LIB_SRCS
@@ -58,6 +55,10 @@ set(LIB_SRCS
     ../../drivers/display_qt.cpp
     ../../drivers/event_qt.cpp
     ../../level2/input.cpp
+    ../../level2/button.cpp
+    ../../level2/checkbox.cpp
+    ../../level2/radio_button.cpp
+    ../../level2/scrolling_list.cpp
     ../../level2/application.cpp
     ../../level2/drawing_context_proxy.cpp
     ../../level2/label.cpp

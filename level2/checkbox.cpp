@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2011 by Terraneo Federico                               *
+ *   Copyright (C) 2014 by Terraneo Federico                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -25,36 +25,83 @@
  *   along with this program; if not, see <http://www.gnu.org/licenses/>   *
  ***************************************************************************/
 
-#ifndef EVENT_TYPES_QT_H
-#define	EVENT_TYPES_QT_H
 
-#if !defined(_MIOSIX) && !defined(_WINDOWS)
+#include "checkbox.h"
+#ifdef MXGUI_LEVEL_2
 
-class EventType
+
+#include <utility>
+
+using namespace std;
+
+namespace mxgui {
+
+CheckBox::CheckBox(Window *w, Point p, short dimension, const string& text, bool checked)
+    : InteractableButton(w,DrawArea(p,Point(p.x()+dimension,p.y()+dimension)))
 {
-public:
-    enum E
+    int textLen =w->getPreferences().font.calculateLength(text.c_str());
+    this->checked=checked;
+    this->colors=make_pair(black,lightGrey);
+    this->labelStartingPoint = Point(p.x()+dimension+4,p.y());
+    this->text=new Label(w,this->labelStartingPoint,textLen,dimension,text);
+    this->text->setXAlignment(Alignment::LEFT);
+    this->text->setYAlignment(Alignment::CENTER);
+    enqueueForRedraw();
+}
+
+
+void CheckBox::resetState()
+{
+    if(colors!=make_pair(black,lightGrey))
     {
-        // These are a must on all backends -- begin
-        Default=0,           // This actually means 'no event'
-        WindowPartialRedraw=8, // At least one drawable has requested redraw
-        WindowForeground=9,    // Window manager moved this window to foreground
-        WindowBackground=10,    // Window manager moved this window to background
-        WindowQuit=11,          // Window manager requested the window to close
-        // These are a must on all backends -- end
-        
-        TouchDown=1,
-        TouchUp=2,
-        TouchMove=3,
-        ButtonA=4,
-        ButtonB=5,
-        KeyDown=6,
-        KeyUp=7
-    };
-private:
-    EventType();
-};
+        colors=make_pair(black,lightGrey);
+        InteractableButton::resetState();
+    }
+    
+}
+void CheckBox::buttonDown()
+{
+    if(colors!=make_pair(white,darkGrey))
+    {
+        colors=make_pair(white,darkGrey);
+        enqueueForRedraw();
+    }
+}
 
-#endif //!defined(_MIOSIX) && !defined(_WINDOWS)
+void CheckBox::buttonUp()
+{
+    this->check();
+    resetState();
+    InteractableButton::buttonUp();
+}
 
-#endif //EVENT_TYPES_QT_H
+void CheckBox::check()
+{
+    checked=!checked;
+}
+
+bool CheckBox::isChecked()
+{
+    return this->checked;
+}
+void CheckBox::onDraw(DrawingContextProxy& dc)
+{
+    DrawArea da=getDrawArea();
+    dc.clear(da.first,da.second,colors.second);
+    dc.drawImage(da.first,tl);
+    dc.drawImage(Point(da.second.x()-2,da.first.y()),tr);
+    dc.drawImage(Point(da.first.x(),da.second.y()-2),bl);
+    dc.drawImage(innerPointBr,br);
+    if(isChecked())
+    {
+        dc.line(innerPointTl,innerPointBr,black);
+        dc.line(Point(innerPointTl.x(),innerPointBr.y()),Point(innerPointBr.x(),innerPointTl.y()),black);
+    }
+
+}
+
+
+
+}//namespace mxgui
+
+#endif //MXGUI_LEVEL_2

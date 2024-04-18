@@ -28,6 +28,7 @@
 #include "application.h"
 #include "pthread_lock.h"
 #include "misc_inst.h"
+#include <iostream>
 
 #ifdef MXGUI_LEVEL_2
 
@@ -116,6 +117,7 @@ void Window::eventLoop()
             for(list<Drawable*>::iterator it=drawables.begin();
                 it!=drawables.end();++it)
             {
+                
                 if((*it)->needsRedraw()==false) continue;
                 (*it)->onDraw(dc);
                 (*it)->redrawDone();
@@ -123,11 +125,11 @@ void Window::eventLoop()
             //Filter out this event
             continue;
         }
-        if(e.getEvent()==EventType::WindowForeground)
+        /*if(e.getEvent()==EventType::WindowForeground)
         {
             FullScreenDrawingContextProxy dc(DisplayManager::instance().getDisplay());//FIXME: get it fron the window manager
             dc.setTextColor(make_pair(prefs.foreground,prefs.background));
-            dc.clear(prefs.background);
+            //dc.clear(prefs.background);
             for(list<Drawable*>::iterator it=drawables.begin();
                 it!=drawables.end();++it)
             {
@@ -135,7 +137,7 @@ void Window::eventLoop()
                 (*it)->redrawDone();
             }
             //Do not filter this out
-        }
+        }*/
         //Forward event. For now we do not yet have a way for a Drawable to
         //register only for a certain class of events, such as touch events only
         //in their draw area, but we simply forward each event to all Drawables,
